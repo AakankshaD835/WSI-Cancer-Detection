@@ -1,7 +1,6 @@
 """
 Regenerate all clinical PDFs from existing .txt + .json report files.
 Reads reports/clinical/*_report.txt + *_analysis.json
-Rewrites the corresponding .pdf with the beautiful redesigned layout.
 """
 import sys
 import json
