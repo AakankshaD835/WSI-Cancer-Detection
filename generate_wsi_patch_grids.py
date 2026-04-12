@@ -3,7 +3,7 @@ Generate per-WSI patch grid images showing the actual top-attention patches
 extracted from the real histopathology HDF5 file.
 
 Saves: reports/clinical/wsi_patches/<wsi_id>_patches.png
-       (used in PDF reports as per-sample medical images)
+       
 """
 import sys, json, h5py, numpy as np, pandas as pd
 import matplotlib
