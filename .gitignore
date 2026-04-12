@@ -54,3 +54,4 @@ ui_app/
 Thumbs.db
 notebooks/
 .claude/
+*.pdf
