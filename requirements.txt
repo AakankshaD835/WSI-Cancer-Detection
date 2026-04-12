@@ -1,0 +1,43 @@
+# ── Core ────────────────────────────────────────────────────────────────────────
+numpy>=1.24.0
+pandas>=2.0.0
+h5py>=3.9.0
+scikit-learn>=1.3.0
+scipy>=1.11.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+tqdm>=4.65.0
+Pillow>=10.0.0
+opencv-python>=4.8.0
+
+# ── Deep Learning ────────────────────────────────────────────────────────────────
+torch>=2.1.0
+torchvision>=0.16.0
+timm>=0.9.7               # ViT, EfficientNet, ResNet via timm
+
+# ── Augmentation ─────────────────────────────────────────────────────────────────
+albumentations>=1.3.1
+
+# ── Stain Normalization ───────────────────────────────────────────────────────────
+# staintools requires spams — install separately if needed:
+#   pip install spams  (or conda install -c conda-forge python-spams)
+# staintools>=2.1.2
+
+# ── Explainability ───────────────────────────────────────────────────────────────
+grad-cam>=1.4.8           # pytorch-grad-cam
+
+# ── LLM Integration ──────────────────────────────────────────────────────────────
+anthropic>=0.25.0         # Claude API
+openai>=1.0.0             # GPT fallback (optional)
+
+# ── Report Generation ────────────────────────────────────────────────────────────
+fpdf2>=2.7.0
+jinja2>=3.1.0
+
+# ── UI ───────────────────────────────────────────────────────────────────────────
+streamlit>=1.28.0
+plotly>=5.17.0
+
+# ── Misc ─────────────────────────────────────────────────────────────────────────
+pyyaml>=6.0
+python-dotenv>=1.0.0

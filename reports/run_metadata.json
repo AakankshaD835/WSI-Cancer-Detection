@@ -1,0 +1,117 @@
+{
+  "run_timestamp": "2026-04-09T11:53:46.914346",
+  "python_version": "3.10.20",
+  "torch_version": "2.5.1+cu121",
+  "cuda_available": true,
+  "cuda_version": "12.1",
+  "gpu": "NVIDIA GeForce GTX 1650",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "git_hash": "N/A",
+  "config": {
+    "paths": {
+      "data_root": "WSI-Data",
+      "pcam_train_x": "WSI-Data/pcam/training_split.h5",
+      "pcam_valid_x": "WSI-Data/pcam/validation_split.h5",
+      "pcam_test_x": "WSI-Data/pcam/test_split.h5",
+      "train_y": "WSI-Data/Labels/Labels/camelyonpatch_level_2_split_train_y.h5",
+      "valid_y": "WSI-Data/Labels/Labels/camelyonpatch_level_2_split_valid_y.h5",
+      "test_y": "WSI-Data/Labels/Labels/camelyonpatch_level_2_split_test_y.h5",
+      "train_mask": "WSI-Data/camelyonpatch_level_2_split_train_mask/camelyonpatch_level_2_split_train_mask.h5",
+      "train_meta": "WSI-Data/Metadata/Metadata/train_metadata.csv",
+      "valid_meta": "WSI-Data/Metadata/Metadata/valid_metadata.csv",
+      "test_meta": "WSI-Data/Metadata/Metadata/test_metadata.csv",
+      "models_dir": "models",
+      "reports_dir": "reports"
+    },
+    "data": {
+      "max_train_samples": 50000,
+      "max_valid_samples": 8000,
+      "max_test_samples": 8000
+    },
+    "preprocessing": {
+      "patch_size": 96,
+      "normalize_mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "normalize_std": [
+        0.229,
+        0.224,
+        0.225
+      ],
+      "tissue_sat_threshold": 15,
+      "use_macenko": true
+    },
+    "training": {
+      "seed": 42,
+      "batch_size": 32,
+      "num_workers": 0,
+      "epochs": 100,
+      "lr": 0.0001,
+      "weight_decay": 0.0001,
+      "grad_clip_norm": 1.0,
+      "warmup_epochs": 5,
+      "scheduler": "cosine",
+      "step_size": 20,
+      "step_gamma": 0.5,
+      "plateau_patience": 8,
+      "plateau_factor": 0.5,
+      "early_stopping_patience": 15,
+      "early_stopping_metric": "auc",
+      "backbone": "efficientnet_b3",
+      "pretrained": true,
+      "num_classes": 1,
+      "threshold": 0.5,
+      "bootstrap_n_iter": 1000,
+      "bootstrap_ci": 0.95
+    },
+    "mil": {
+      "min_bag_size": 20,
+      "max_bag_size": 50,
+      "feature_dim": 512,
+      "attention_dim": 256,
+      "hidden_dim": 256,
+      "dropout": 0.25,
+      "use_wsi_grouping": true,
+      "epochs": 100,
+      "lr": 0.0002,
+      "weight_decay": 1e-05,
+      "early_stopping_patience": 15,
+      "early_stopping_metric": "auc",
+      "threshold": 0.5,
+      "bootstrap_n_iter": 1000,
+      "bootstrap_ci": 0.95
+    },
+    "explainability": {
+      "target_layer": "layer4",
+      "n_heatmap_samples": 16,
+      "save_heatmaps": true,
+      "gradcam_n_samples": 500,
+      "cam_threshold": 0.5,
+      "vit_discard_ratio": 0.9
+    },
+    "llm": {
+      "provider": "groq",
+      "model": "claude-opus-4-6",
+      "groq_model": "llama-3.3-70b-versatile",
+      "gemini_model": "gemini-1.5-flash",
+      "hf_model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+      "max_tokens": 2048,
+      "temperature": 0.3,
+      "high_confidence_threshold": 0.8,
+      "medium_confidence_threshold": 0.5
+    },
+    "virtual_staining": {
+      "epochs": 10,
+      "lr": 0.0002,
+      "lambda_cycle": 10.0,
+      "lambda_identity": 5.0,
+      "image_size": 96,
+      "train_batch_size": 4,
+      "infer_batch_size": 64,
+      "max_per_domain": 2000,
+      "buffer_size": 50
+    }
+  }
+}

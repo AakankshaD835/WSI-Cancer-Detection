@@ -1,0 +1,125 @@
+# =============================================================================
+# WSI Cancer Detection Pipeline - Full Configuration
+# Research-grade: all hyperparameters explicit, nothing hardcoded in code
+# =============================================================================
+
+paths:
+  data_root:       "WSI-Data"
+  pcam_train_x:    "WSI-Data/pcam/training_split.h5"
+  pcam_valid_x:    "WSI-Data/pcam/validation_split.h5"
+  pcam_test_x:     "WSI-Data/pcam/test_split.h5"
+  train_y:         "WSI-Data/Labels/Labels/camelyonpatch_level_2_split_train_y.h5"
+  valid_y:         "WSI-Data/Labels/Labels/camelyonpatch_level_2_split_valid_y.h5"
+  test_y:          "WSI-Data/Labels/Labels/camelyonpatch_level_2_split_test_y.h5"
+  train_mask:      "WSI-Data/camelyonpatch_level_2_split_train_mask/camelyonpatch_level_2_split_train_mask.h5"
+  train_meta:      "WSI-Data/Metadata/Metadata/train_metadata.csv"
+  valid_meta:      "WSI-Data/Metadata/Metadata/valid_metadata.csv"
+  test_meta:       "WSI-Data/Metadata/Metadata/test_metadata.csv"
+  models_dir:      "models"
+  reports_dir:     "reports"
+
+# -----------------------------------------------------------------------------
+# Data limits (set to null to use full dataset)
+# -----------------------------------------------------------------------------
+data:
+  max_train_samples: 50000
+  max_valid_samples: 8000
+  max_test_samples:  8000
+
+preprocessing:
+  patch_size:            96
+  normalize_mean:        [0.485, 0.456, 0.406]   # ImageNet stats for pretrained models
+  normalize_std:         [0.229, 0.224, 0.225]
+  tissue_sat_threshold:  15                        # HSV saturation below = background
+  use_macenko:           true
+
+# -----------------------------------------------------------------------------
+# Phase 3 - Patch-Level CNN Training
+# -----------------------------------------------------------------------------
+training:
+  seed:                      42
+  batch_size:                32
+  num_workers:               0
+  epochs:                    100                  # 262K patches - train to full convergence
+  lr:                        0.0001
+  weight_decay:              0.0001
+  grad_clip_norm:            1.0                  # gradient clipping max norm
+  warmup_epochs:             5                    # linear LR warmup epochs
+  scheduler:                 "cosine"             # cosine | step | plateau
+  # cosine: decays from lr -> 0 over (epochs - warmup_epochs)
+  # step:   decays by step_gamma every step_size epochs
+  step_size:                 20
+  step_gamma:                0.5
+  # plateau: reduces on val AUC plateau
+  plateau_patience:          8
+  plateau_factor:            0.5
+  early_stopping_patience:   15                   # generous - large dataset
+  early_stopping_metric:     "auc"               # auc | f1 | loss
+  backbone:                  "efficientnet_b3"    # resnet50 | efficientnet_b3 | vit_base_patch16_224
+  pretrained:                true
+  num_classes:               1                    # binary: sigmoid output
+  # Decision threshold for F1/accuracy/confusion matrix
+  threshold:                 0.5
+  # Bootstrap CI
+  bootstrap_n_iter:          1000
+  bootstrap_ci:              0.95                 # 95% confidence interval
+
+# -----------------------------------------------------------------------------
+# Phase 4 - Slide-Level MIL
+# -----------------------------------------------------------------------------
+mil:
+  min_bag_size:              20
+  max_bag_size:              50
+  feature_dim:               512                  # projected feature dimension
+  attention_dim:             256
+  hidden_dim:                256
+  dropout:                   0.25
+  use_wsi_grouping:          true
+  epochs:                    100
+  lr:                        0.0002
+  weight_decay:              0.00001
+  early_stopping_patience:   15
+  early_stopping_metric:     "auc"
+  threshold:                 0.5
+  bootstrap_n_iter:          1000
+  bootstrap_ci:              0.95
+
+# -----------------------------------------------------------------------------
+# Phase 5 - Explainability
+# -----------------------------------------------------------------------------
+explainability:
+  target_layer:              "layer4"             # ResNet; auto-detected for EffNet/ViT
+  n_heatmap_samples:         16
+  save_heatmaps:             true
+  gradcam_n_samples:         500                  # limit for GTX 1650 (was null = 131K OOM)
+  cam_threshold:             0.5                  # binarization threshold for IoU/Dice
+  vit_discard_ratio:         0.9                  # fraction of low-attention tokens to drop
+
+# -----------------------------------------------------------------------------
+# Phase 7 - LLM Clinical Reports
+# -----------------------------------------------------------------------------
+llm:
+  provider:                  "groq"               # FREE options: groq | gemini | huggingface | anthropic | openai
+  model:                     "claude-opus-4-6"    # used if provider=anthropic
+  groq_model:                "llama-3.3-70b-versatile"   # FREE via groq.com
+  gemini_model:              "gemini-1.5-flash"           # FREE via aistudio.google.com
+  hf_model:                  "mistralai/Mixtral-8x7B-Instruct-v0.1"  # FREE via huggingface.co
+  max_tokens:                2048                 # reduced for free tier limits
+  temperature:               0.3                  # low = more deterministic, clinical
+  # Confidence thresholds (validated against ROC operating points)
+  high_confidence_threshold: 0.80
+  medium_confidence_threshold: 0.50
+
+# -----------------------------------------------------------------------------
+# Phase 6 - CycleGAN Virtual Staining
+# -----------------------------------------------------------------------------
+virtual_staining:
+  epochs:                    10                   # reduced for GTX 1650 (demo quality)
+  lr:                        0.0002
+  lambda_cycle:              10.0
+  lambda_identity:           5.0
+  image_size:                96
+  train_batch_size:          4                    # keep small for GAN stability
+  infer_batch_size:          64
+  max_per_domain:            2000                 # limit per domain for feasible training
+  buffer_size:               50                   # fake image replay buffer
