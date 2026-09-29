@@ -1,4 +1,4 @@
-# WSI Cancer Detection Pipeline
+# OncoLens: WSI Cancer Detection Pipeline
 
 End-to-end computational pathology pipeline for breast cancer detection on the PatchCamelyon (PCam / Camelyon16) dataset. Covers the full stack: patch-level CNN training, slide-level aggregation with attention MIL, Grad-CAM explainability, CycleGAN virtual staining, and LLM-generated clinical reports.
 
